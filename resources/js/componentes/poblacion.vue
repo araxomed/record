@@ -11,11 +11,21 @@
             </div>
         </div>
         <div v-if="display == 'data'">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="xwk-1" v-model="enable_rem">
-                <label class="form-check-label" for="xwk-1">Habilitar eliminación</label>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="form-floating">
+                        <select class="form-select" id="cm-1" aria-label="Floating label select example" v-model="area">
+                            <option v-for="(are, i) in areas" :key="i" :value="are">{{ are.label }}</option>
+                        </select>
+                        <label for="cm-1">Seleccione el área</label>
+                    </div>                    
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="xwk-1" v-model="enable_rem">
+                    <label class="form-check-label" for="xwk-1">Habilitar eliminación</label>
+                </div>
             </div>
-            <div class="table-responsive">
+            <div class="table-responsive mt-4">
                 <table class="table align-middle">
                     <thead>
                         <tr>
@@ -23,25 +33,28 @@
                             <th class="colmin px-4">Identificación</th>
                             <th>Nombres y apellidos</th>
                             <th>Área</th>
-                            <th class="colmin">Encuestas diligenciadas</th>
+                            <th>Encuesta</th>
+                            <th class="colmin">Diligenciada</th>
                             <th class="colmin text-center" v-if="enable_rem">Acción</th>
                         </tr>
                     </thead>
                     <tbody v-if="enable_rem == false">
-                        <tr v-for="(elm, i) in registros" :key="i">
+                        <tr v-for="(elm, i) in getRegistros()" :key="i">
                             <td class="text-center">{{ i + 1 }}</td>
                             <td class="px-4">{{ elm.numdoc }}</td>
                             <td>{{ elm.name }}</td>
-                            <td>{{ elm.area }}</td>
+                            <td :class="targetArea == 'all'? '': 'bg-light-warning border border-warning'">{{ elm.area }}</td>
+                            <td>{{ elm.formulario }}</td>
                             <td class="text-center"><span :class="elm.lc_total > 0? 'badge bg-success rounded-pill': 'badge bg-danger rounded-pill'">{{ elm.lc_total }}</span></td>
                         </tr>
                     </tbody>
                     <tbody v-else>
-                        <tr v-for="(elm, i) in registros" :key="i">
+                        <tr v-for="(elm, i) in getRegistros()" :key="i">
                             <td class="text-center">{{ i + 1 }}</td>
                             <td class="px-4">{{ elm.numdoc }}</td>
                             <td>{{ elm.name }}</td>
-                            <td>{{ elm.area }}</td>
+                            <td :class="targetArea == 'all'? '': 'bg-light-warning border border-warning'">{{ elm.area }}</td>
+                            <td>{{ elm.formulario }}</td>
                             <td class="text-center"><span :class="elm.lc_total > 0? 'badge bg-success rounded-pill': 'badge bg-danger rounded-pill'">{{ elm.lc_total }}</span></td>
                             <td>
                                 <div class="d-flex justify-content-center order-actions">
@@ -114,6 +127,9 @@ export default {
             forms: [],
             dictForm: {},
             registros: [],
+            areas: [],
+            area: {'label': 'Todas las áreas', 'value': 'all'},
+            targetArea: 'all',
             raw_excel: '',
             boxdata: [],
             status: 'ini',
@@ -124,6 +140,9 @@ export default {
     watch: {
         raw_excel: function(val){
             this.processData();
+        },
+        area: function(val){
+            this.targetArea = val.value;
         }
     },
     methods: {
@@ -136,8 +155,6 @@ export default {
             axios.post(this.mimetic, {'tabla': 'formularios', 'campos': 'id,formulario'}).then(res => {
                 this.forms = res.data;
                 res.data.forEach(elm => this.dictForm[elm.formulario] = elm.id);
-                console.log(res.data);
-                console.log(this.dictForm);
             }).catch(err => {console.log(err)});
         },
         getFormId: function(tx){
@@ -145,12 +162,28 @@ export default {
             var elm = this.forms.filter(el => rul.test(el.formulario));
             return (elm.length > 0)? elm[0].id: null;
         },
+        getRegistros: function(){
+            if(this.targetArea == 'all'){
+                return this.registros;
+            }else{
+                return this.registros.filter(elm => elm.area == this.targetArea)
+            }
+        },
         loadPeople: function(){
             this.status = this.state.LOADING;
-            let campos = "poblacion.id, poblacion.numdoc, poblacion.name, poblacion.area";
-            axios.post(this.mimetic, {'tabla': 'poblacion', 'join': 'formularios_response:poblacion.numdoc:formularios_response.numdoc:left', 'agrupar': 'poblacion.numdoc:formularios_response.id', 'campos': campos}).then(res => {
+            let campos = "poblacion.id, poblacion.numdoc, poblacion.name, poblacion.area, formularios.formulario";
+            axios.post(this.mimetic, {'tabla': 'poblacion', 'join': 'formularios:poblacion.formulario_id:formularios.id:left|formularios_response:poblacion.numdoc:formularios_response.numdoc:left', 'agrupar': 'poblacion.numdoc:formularios_response.id', 'campos': campos}).then(res => {
                 this.registros = res.data;
-                console.log(res.data);
+                let tmp = {};
+                res.data.forEach(elm => {
+                    if(this.is_empty(elm.area)){
+                        tmp['-void-'] = '';
+                    }else{
+                        tmp[elm.area] = '';
+                    }
+                });
+                this.areas = Object.keys(tmp).map(elm => elm == '-void-'? ({'label': 'Sin área asignada', 'value': null}): ({'label': elm, 'value': elm})).sort((a, b) => b.label - a.label);
+                this.areas.unshift({'label': 'Todas las áreas', 'value': 'all'});
                 this.status = this.state.LOADED;
             }).catch(err => {
                 console.log(err);
@@ -175,7 +208,6 @@ export default {
                     }
                 }
             });
-            console.log(this.boxdata);
         },
         addPeople: function(){
             if(this.boxdata.length > 0){

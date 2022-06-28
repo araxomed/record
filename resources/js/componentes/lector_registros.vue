@@ -27,7 +27,13 @@
                     </div>
                     <button class="btn btn-primary flex-fill ms-2" v-on:click="loadData"><i class="bx bx-search"></i> Buscar</button>
                 </div>
-                <div class="table-responsive">
+                <div v-if="data_first == 0" class="alert alert-warning border border-warning py-1">
+                    <div class="d-flex align-items-center">
+                        <div class="font-35"><i class='bx bxs-error'></i></div>
+                        <div class="ms-2">No se ha diligenciado ningún ejemplar de esta encuesta!</div>
+                    </div>
+                </div>
+                <div class="table-responsive" v-else>
                     <table class="table align-middle">
                         <thead>
                             <tr>
@@ -92,6 +98,7 @@ export default {
             f_name: '',
             f_cargo: '',
             status: 'ini',
+            data_first: -1,
             state: {'INI': 'ini', 'LOADING': 'loading', 'LOADED': 'loaded', 'FAILED': 'failed'}
         }
     },
@@ -130,9 +137,11 @@ export default {
                 pam['operador4'] = 'like';
             }
             axios.post(this.mimetic, pam).then(res => {
-                console.log('data len');
                 console.log(res.data);
                 this.registros = res.data;
+                if(this.data_first == -1){
+                    this.data_first = this.registros.length;
+                }
             }).catch(err => {
                 console.log('Error catch!');
                 console.log(err);
