@@ -200,7 +200,7 @@ export default {
                 });
                 this.areas = Object.keys(tmp).map(elm => elm == '-void-'? ({'label': 'Sin área asignada', 'value': null}): ({'label': elm, 'value': elm})).sort((a, b) => b.label - a.label);
                 this.areas.unshift({'label': '', 'value': 'all'});
-                this.evaluadores = Object.keys(eva);
+                this.evaluadores = Object.keys(eva).sort();
                 this.status = this.state.LOADED;
             }).catch(err => {
                 console.log(err);
