@@ -19,6 +19,7 @@ Route::get('/', [RecordController::class, 'panel'])->name('main');
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::get('/inicio', [RecordController::class, 'inicio'])->name('inicio');
     Route::get('/poblacion', [RecordController::class, 'poblacion'])->name('poblacion');
+    Route::get('/asignados', [RecordController::class, 'asignados'])->name('asignados');
     Route::post('/poblacion/save', [RecordController::class, 'vueSavePeople'])->name('poblacion.save');
     Route::post('/poblacion/remove', [RecordController::class, 'vueRemovePeople'])->name('poblacion.remove');
     Route::get('/encuestas', [RecordController::class, 'showForms'])->name('encuestas');

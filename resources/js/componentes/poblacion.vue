@@ -14,16 +14,16 @@
             <div class="d-flex justify-content-between">
                 <div>
                     <div class="d-flex">
-                        <div class="form-floating me-3">
+                        <div class="form-floating me-3" style="min-width:250px">
                             <select class="form-select" id="cm-1" aria-label="Floating label select example" v-model="area">
                                 <option v-for="(are, i) in areas" :key="i" :value="are">{{ are.label }}</option>
                             </select>
                             <label for="cm-1">Seleccione el área</label>
                         </div>
-                        <div class="form-floating">
+                        <div class="form-floating" style="min-width:250px">
                             <select class="form-select" id="cm-1" aria-label="Floating label select example" v-model="targetEval">
                                 <option value=""></option>
-                                <option v-for="(eva, i) in evaluadores" :key="i" :value="eva">{{ eva }}</option>
+                                <option v-for="(eva, i) in evaluadores" :key="i" :value="eva.id">{{ eva.name }}</option>
                             </select>
                             <label for="cm-1">Seleccione el evaluador</label>
                         </div>
@@ -54,7 +54,7 @@
                             <td class="px-4">{{ elm.numdoc }}</td>
                             <td>{{ elm.name }}</td>
                             <td :class="targetArea == 'all'? '': 'bg-light-warning border border-warning'">{{ elm.area }}</td>
-                            <td>{{ elm.evaluador }}</td>
+                            <td>{{ elm.responsable }}</td>
                             <td>{{ elm.formulario }}</td>
                             <td class="text-center"><span :class="elm.lc_total > 0? 'badge bg-success rounded-pill': 'badge bg-danger rounded-pill'">{{ elm.lc_total }}</span></td>
                         </tr>
@@ -65,7 +65,7 @@
                             <td class="px-4">{{ elm.numdoc }}</td>
                             <td>{{ elm.name }}</td>
                             <td :class="targetArea == 'all'? '': 'bg-light-warning border border-warning'">{{ elm.area }}</td>
-                            <td>{{ elm.evaluador }}</td>
+                            <td>{{ elm.responsable }}</td>
                             <td>{{ elm.formulario }}</td>
                             <td class="text-center"><span :class="elm.lc_total > 0? 'badge bg-success rounded-pill': 'badge bg-danger rounded-pill'">{{ elm.lc_total }}</span></td>
                             <td>
@@ -178,29 +178,31 @@ export default {
         },
         getRegistros: function(){
             if(this.targetArea == 'all'){
-                return (this.targetEval == '')? this.registros: this.registros.filter(elm => elm.evaluador == this.targetEval);
+                return (this.targetEval == '')? this.registros: this.registros.filter(elm => elm.user_id == this.targetEval);
             }else{
-                return (this.targetEval == '')? this.registros.filter(elm => elm.area == this.targetArea): this.registros.filter(elm => elm.area == this.targetArea && elm.evaluador == this.targetEval);
+                return (this.targetEval == '')? this.registros.filter(elm => elm.area == this.targetArea): this.registros.filter(elm => elm.area == this.targetArea && elm.user_id == this.targetEval);
             }
+        },
+        loadResponsables: function(){
+            axios.post(this.mimetic, {'tabla': 'users', 'campos': 'users.id, users.name', 'orden': 'users.name'}).then(res => {
+                this.evaluadores = res.data;
+            }).catch(err => {console.log(err)});
         },
         loadPeople: function(){
             this.status = this.state.LOADING;
-            let campos = "poblacion.id, poblacion.numdoc, poblacion.name, poblacion.area, poblacion.evaluador, formularios.formulario";
-            axios.post(this.mimetic, {'tabla': 'poblacion', 'join': 'formularios:poblacion.formulario_id:formularios.id:left|formularios_response:poblacion.numdoc:formularios_response.numdoc:left', 'agrupar': 'poblacion.numdoc:formularios_response.id', 'campos': campos}).then(res => {
+            let campos = "users.name AS responsable, poblacion.id, poblacion.numdoc, poblacion.name, poblacion.area, poblacion.evaluador, poblacion.user_id, formularios.formulario";
+            axios.post(this.mimetic, {'tabla': 'poblacion', 'join': 'users:poblacion.user_id:users.id:left|formularios:poblacion.formulario_id:formularios.id:left|formularios_response:poblacion.numdoc:formularios_response.numdoc:left', 'agrupar': 'poblacion.numdoc:formularios_response.id', 'campos': campos}).then(res => {
                 this.registros = res.data;
                 let tmp = {};
-                let eva = {};
                 res.data.forEach(elm => {
                     if(this.is_empty(elm.area)){
                         tmp['-void-'] = '';
                     }else{
                         tmp[elm.area] = '';
                     }
-                    if(elm.evaluador != null) eva[elm.evaluador] = '';
                 });
                 this.areas = Object.keys(tmp).map(elm => elm == '-void-'? ({'label': 'Sin área asignada', 'value': null}): ({'label': elm, 'value': elm})).sort((a, b) => b.label - a.label);
                 this.areas.unshift({'label': '', 'value': 'all'});
-                this.evaluadores = Object.keys(eva).sort();
                 this.status = this.state.LOADED;
             }).catch(err => {
                 console.log(err);
@@ -261,6 +263,7 @@ export default {
         }
     },
     mounted() {
+        this.loadResponsables();
         this.loadForms();
         this.loadPeople();
     }

@@ -22,9 +22,20 @@ class RecordController extends Controller
             // return view('inicio_super', ['datos' => $data]);
             return $this->showForms();
         }else if($rol == 'admin'){
-            return view('inicio_admin');
+            // return view('inicio_admin');
+            return $this->showForms();
         }else{
             return view('inicio_client');
+        }
+    }
+
+    public function asignados()
+    {
+        $rol = Auth::user()->rol;
+        if($rol != 'client'){
+            return view('asignados');
+        }else{
+            $this->inicio();
         }
     }
 

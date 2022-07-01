@@ -5,6 +5,7 @@ import AlertComponent from "./componentes/alerta.vue";
 import Reader from "./componentes/encuesta_reader.vue";
 import ReaderPlus from "./componentes/encuesta_reader_plus.vue";
 import Pobla from "./componentes/poblacion.vue";
+import Tokada from "./componentes/asignados.vue";
 import Barra from "./componentes/am_bar.vue";
 import Torta from "./componentes/am_pie.vue";
 import Braket from "./componentes/am_bar_tech.vue";
@@ -17,6 +18,7 @@ createApp({
         'encuesta-show': Reader,
         'encuesta-plus': ReaderPlus,
         'comp-poblacion': Pobla,
+        'comp-asignados': Tokada,
         'am-bar': Barra,
         'am-bar-tech': Braket,
         'am-pie': Torta,
