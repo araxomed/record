@@ -4,6 +4,12 @@
         <div class="menu-title">Encuestas</div>
     </a>
 </li>
+<li id="md-asig">
+    <a href="{{ route('asignados') }}">
+        <div class="parent-icon"><i class="bx bx-task"></i></div>
+        <div class="menu-title">Asignados</div>
+    </a>
+</li>
 <li id="ml-pob">
     <a href="{{ route('poblacion') }}">
         <div class="parent-icon"><i class="bx bx-star"></i></div>
