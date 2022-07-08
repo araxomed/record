@@ -196,7 +196,6 @@ class RecordController extends Controller
                 $res->numdoc = $request->numdoc;
                 $res->cargo = $request->cargo;
                 $res->rol = $request->rol;
-                $res->mision = $request->mision;
                 $res->stt_lock = 'close';
                 $res->resultado = $request->resultado;
                 $res->formulario_id = $request->formulario_id;
@@ -262,6 +261,43 @@ class RecordController extends Controller
     {
         $rs = DB::table('formularios_response')->select('formulario_id', DB::raw("DATE(created_at) AS fecha"), DB::raw("COUNT(*) AS total"))->groupBy('formulario_id', 'fecha')->orderBy('fecha')->get();
         return $rs;
+    }
+
+    public function vueEditNum(Request $request)
+    {
+        $response_id = $request->response_id;
+        $data_id = $request->data_id;
+        $valor = $request->valor;
+        $resultado = $request->resultado;
+        $status = 'ini';
+        $info = null;
+        DB::beginTransaction();
+        try{
+            $res = FormularioResponse::find($response_id);
+            $res->resultado = $resultado;
+            $res->save();
+            $dat = FormularioData::find($data_id);
+            $dat->valor = $valor;
+            $dat->save();
+            DB::commit();
+            $status = 'success';
+        } catch(\Exception $e){
+            DB::rollBack();
+            $status = 'failed';
+            $info = $e->getMessage();
+        }
+        return ['status' => $status, 'info' => $info];
+    }
+
+    public function vueEditText(Request $request)
+    {
+        $data_id = $request->data_id;
+        $texto = $request->texto;
+        $dat = FormularioData::find($data_id);
+        $dat->texto = $texto;
+        $rs = $dat->save();
+        $status = $rs? 'success': 'failed';
+        return ['status' => $status];
     }
 
 }

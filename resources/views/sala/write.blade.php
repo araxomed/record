@@ -27,7 +27,9 @@
             pathpanel="{{ route('panel', $person->numdoc) }}"
             keydata="{{ $form_id }}" 
             employee="{{ $person->name }}" 
-            cedula="{{ $person->numdoc }}"></encuesta-show>
+            cedula="{{ $person->numdoc }}"
+            mastercargo="{{ $person->cargo }}"
+            masterrol="{{ $person->rol }}"></encuesta-show>
     </div>
 </div>
 @endsection

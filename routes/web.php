@@ -31,6 +31,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/encuesta/{id}/all', [RecordController::class, 'excelData'])->name('poll.excell');
 
     Route::post('/vue/mimetic', [GeneralController::class, 'mimeticSearch'])->name('mimetic');
+    Route::post('/vue/mimetic/data/items', [GeneralController::class, 'vueChartData'])->name('mimetic.items');
+    Route::post('/vue/mimetic/data/response/chart', [GeneralController::class, 'vueChartResponse'])->name('mimetic.chart');
+    Route::post('/vue/mimetic/data/edit/num', [RecordController::class, 'vueEditNum'])->name('mimetic.edit.num');
+    Route::post('/vue/mimetic/data/edit/text', [RecordController::class, 'vueEditText'])->name('mimetic.edit.text');
 });
 
 Route::get('/panel/{cc?}', [RecordController::class, 'panel'])->name('panel');

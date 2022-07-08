@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Formulario;
 use DB;
 
 class GeneralController extends Controller
@@ -71,6 +72,28 @@ class GeneralController extends Controller
                 return $qry->get();
             }
         }
+    }
+
+    public function vueChartData(Request $request)
+    {
+        $id = $request->id;
+        $form = Formulario::find($id);
+        $items = DB::table('formularios_items')->where('formulario_id', $id)->whereIn('tipo', ['title', 'num'])->orderBy('orden')->get();
+        return ['form' => $form, 'items' => $items];
+    }
+
+    public function vueChartResponse(Request $request)
+    {
+        $user_id = $request->user_id;
+        $total = DB::table('poblacion')->join('formularios_response', 'poblacion.numdoc', '=', 'formularios_response.numdoc')->where('poblacion.user_id', '=', $user_id)->count();
+        $data = DB::table('poblacion')
+            ->join('formularios_response', 'poblacion.numdoc', '=', 'formularios_response.numdoc')
+            ->join('formularios_data', 'formularios_response.id', '=', 'formularios_data.response_id')
+            ->join('formularios_items', 'formularios_data.item_id', '=', 'formularios_items.id')
+            ->where([['poblacion.user_id', '=', $user_id], ['formularios_items.tipo', '=', 'num']])
+            ->select('formularios_data.item_id', 'formularios_data.valor')
+            ->get();
+        return ['total' => $total, 'datos' => $data];
     }
 
 }

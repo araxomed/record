@@ -38,20 +38,16 @@
             </div>
             <div class="col-sm-3">
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="tx-2" autocomplete="off" v-model="datos['cargo']">
+                    <input type="text" class="form-control" id="tx-2" autocomplete="off" v-model="datos['cargo']" :readonly="mastercargo != '' && display == 'write'">
                     <label for="tx-2">Cargo:</label>
                 </div>
             </div>
             <div class="col-sm-3">
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="tx-3" autocomplete="off" v-model="datos['rol']">
+                    <input type="text" class="form-control" id="tx-3" autocomplete="off" v-model="datos['rol']" :readonly="masterrol != '' && display == 'write'">
                     <label for="tx-3">Rol ocupacional:</label>
                 </div>
             </div>
-        </div>
-        <div class="form-floating mb-3">
-            <textarea class="form-control" id="tx-4" style="height: 100px" v-model="datos['mision']"></textarea>
-            <label for="tx-4">Misión del cargo:</label>
         </div>
         <table class="table table-bordered">
             <tbody>
@@ -113,7 +109,8 @@
                     <th colspan="6" class="border border-secondary">
                         <div class="d-flex justify-content-center">
                             <div>
-                                <div class="fs-2 fw-light mx-5">{{ lc_total - lc_pending }} / {{ lc_total }}</div>
+                                <div class="fs-2 fw-light mx-5 mb-0" style="line-height:2rem">{{ lc_total - lc_pending }} de {{ lc_total }}</div>
+                                <div class="fw-light text-center mb-2" style="font-size:.75rem; letter-spacing:2px">Preguntas resueltas</div>
                                 <div class="progress">
                                     <div class="progress-bar bg-success" role="progressbar" :style="{'width': getAvance()}" aria-valuemin="0" aria-valuemax="100">{{ getAvance() }}</div>
                                 </div>
@@ -149,6 +146,8 @@ export default {
         keydata: {type: String, default: ''},
         employee: {type: String, default: ''},
         cedula: {type: String, default: ''},
+        mastercargo: {type: String, default: ''},
+        masterrol: {type: String, default: ''},
         display: {type: String, default: 'write'}   // write | read | preview
     },
     data() {
@@ -157,11 +156,11 @@ export default {
             form: null,
             response: null,
             items: [],
-            datos: {'formulario_id': '', 'name': '', 'numdoc': '', 'cargo': '', 'rol': '', 'mision': ''},  // Fill dinamically...
+            datos: {'formulario_id': '', 'name': '', 'numdoc': '', 'cargo': '', 'rol': ''},  // Fill dinamically...
             num_total: 0,
             num_suma: 0,
             num_fields: [],
-            specials: ['name', 'numdoc', 'cargo', 'rol', 'mision'],
+            specials: ['name', 'numdoc', 'cargo', 'rol'],
             lc_total: 0,
             lc_pending: 0,
             summary: {'total': 0, 'pendientes': 0},
@@ -216,7 +215,7 @@ export default {
                 this.form = res.data.form;
                 this.num_total = 0;
                 if(this.display == 'write' || this.display == 'preview'){
-                    this.specials =['name', 'numdoc', 'cargo', 'rol', 'mision'];
+                    this.specials =['name', 'numdoc', 'cargo', 'rol'];
                     this.items = res.data.items.map(elm => {
                         if(elm.tipo != 'title' && elm.tipo != 'sub'){
                             elm.field = 'key_' + elm.tipo + '_' + elm.id;
@@ -242,7 +241,6 @@ export default {
                         this.datos['numdoc'] = this.response.numdoc;
                         this.datos['cargo'] = this.response.cargo;
                         this.datos['rol'] = this.response.rol;
-                        this.datos['mision'] = this.response.mision;
                     }
                     this.items = res.data.items.map(elm => {
                         if(elm.tipo != 'title' && elm.tipo != 'sub'){
@@ -293,6 +291,8 @@ export default {
             this.datos['formulario_id'] = this.keydata;
             this.datos['name'] = this.employee;
             this.datos['numdoc'] = this.cedula;
+            this.datos['cargo'] = this.mastercargo;
+            this.datos['rol'] = this.masterrol;
             this.css_all.title = 'bg-primary fw-bold text-white font-title';
         }else if(this.display == 'preview'){
             this.css_all.title = 'bg-primary fw-bold text-white font-title';

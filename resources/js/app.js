@@ -12,6 +12,7 @@ import Braket from "./componentes/am_bar_tech.vue";
 import ReadRecord from "./componentes/lector_registros.vue";
 import Statics from "./componentes/estadisticas.vue";
 import Exdata from "./componentes/excel_data.vue";
+import Chakro from "./componentes/chart_component.vue";
 
 createApp({
     components: {
@@ -24,7 +25,8 @@ createApp({
         'am-pie': Torta,
         'lector-registro': ReadRecord,
         'cmp-estadisticas': Statics,
-        'excel-data': Exdata
+        'excel-data': Exdata,
+        'chart-component': Chakro
     }
 }).mount("#appRecord");
 
