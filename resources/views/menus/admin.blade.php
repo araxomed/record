@@ -1,4 +1,4 @@
-<li id="ml-enc">
+<li id="ml-enc" class="d-none">
     <a href="{{ route('inicio') }}">
         <div class="parent-icon"><i class="bx bx-coffee"></i></div>
         <div class="menu-title">Encuestas</div>

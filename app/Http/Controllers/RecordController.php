@@ -23,7 +23,7 @@ class RecordController extends Controller
             return $this->showForms();
         }else if($rol == 'admin'){
             // return view('inicio_admin');
-            return $this->showForms();
+            return redirect()->route('asignados');// $this->asignados();
         }else{
             return view('inicio_client');
         }
@@ -35,7 +35,7 @@ class RecordController extends Controller
         if($rol != 'client'){
             return view('asignados');
         }else{
-            $this->inicio();
+            return view('inicio_client');
         }
     }
 

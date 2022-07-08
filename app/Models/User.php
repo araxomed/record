@@ -61,7 +61,7 @@ class User extends Authenticatable
 
     public function getHumanRolAttribute()
     {
-        return ['super' => 'Super usuario', 'admin' => 'Administrador', 'client' => 'Usuario'][$this->attributes['rol']];
+        return ['super' => 'Super usuario', 'admin' => 'Evaluador', 'client' => 'Usuario'][$this->attributes['rol']];
     }
 
 }
