@@ -107,7 +107,7 @@ export default {
                             tm[elm.id].poblacion.push({'numdoc': elm.numdoc, 'persona': elm.persona});
                         }
                     });
-                    this.datos = Object.values(tm);
+                    this.datos = Object.values(tm).sort((a, b) => this.sortAsc(a.name, b.name));
                     if(this.datos.length > 0){
                         this.targetUser = this.datos[0];
                     }
@@ -151,7 +151,14 @@ export default {
                     this.status = this.state.FAILED;
                 });
             }
+        },
+        sortAsc: function(a, b){
+            if(a == b){
+                return 0;
+            }
+            return (a < b)? -1: 1;
         }
+
     },
     mounted() {
         this.loadData();
