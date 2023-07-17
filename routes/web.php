@@ -29,12 +29,17 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/encuesta/{id}/dashboard', [RecordController::class, 'showDashboard'])->name('encuesta.dashboard');
     Route::post('/poll/item/statistic', [RecordController::class, 'vueItemStatistic'])->name('poll.item.statistic');
     Route::get('/encuesta/{id}/all', [RecordController::class, 'excelData'])->name('poll.excell');
+    Route::view('/asignacion', 'asignacion');
 
     Route::post('/vue/mimetic', [GeneralController::class, 'mimeticSearch'])->name('mimetic');
     Route::post('/vue/mimetic/data/items', [GeneralController::class, 'vueChartData'])->name('mimetic.items');
     Route::post('/vue/mimetic/data/response/chart', [GeneralController::class, 'vueChartResponse'])->name('mimetic.chart');
     Route::post('/vue/mimetic/data/edit/num', [RecordController::class, 'vueEditNum'])->name('mimetic.edit.num');
     Route::post('/vue/mimetic/data/edit/text', [RecordController::class, 'vueEditText'])->name('mimetic.edit.text');
+    Route::post('/vue/mimetic/data/people', [RecordController::class, 'vuePeople']);
+    Route::post('/vue/mimetic/by/user', [RecordController::class, 'vuePoblacionByUser']);
+    Route::post('/vue/mimetic/by/numdocs', [RecordController::class, 'vuePoblacionByNumdoc']);
+    Route::post('/vue/mimetic/reasign/poblacion', [RecordController::class, 'vueReasignPoblacion']);
 });
 
 Route::get('/panel/{cc?}', [RecordController::class, 'panel'])->name('panel');

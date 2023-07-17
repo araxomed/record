@@ -172,8 +172,12 @@ export default {
         },
         loadPeople: function(){
             this.status = this.state.LOADING;
-            let campos = "users.name AS responsable, poblacion.numdoc, poblacion.name, poblacion.area, formularios.formulario, formularios_response.cargo, formularios_response.resultado, formularios_response.id";
-            let junta = "users:poblacion.user_id:users.id|formularios:poblacion.formulario_id:formularios.id:left|formularios_response:poblacion.numdoc:formularios_response.numdoc:left";
+            let campos = "users.name AS responsable, poblacion.numdoc, poblacion.name, poblacion.area, form_active_view.formulario, response_active_view.cargo, response_active_view.resultado, response_active_view.id";
+            let junta = [
+                "users:poblacion.user_id:users.id",
+                "form_active_view:poblacion.formulario_id:form_active_view.id:left",
+                "response_active_view:poblacion.numdoc:response_active_view.numdoc:left"
+            ].join('|');
             axios.post(this.mimetic, {'tabla': 'poblacion', 'join': junta, 'campo1': 'poblacion.user_id', 'valor1': this.user, 'campos': campos}).then(res => {
                 this.registros = res.data;
                 let tmp = {};

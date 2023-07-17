@@ -190,8 +190,20 @@ export default {
         },
         loadPeople: function(){
             this.status = this.state.LOADING;
-            let campos = "users.name AS responsable, poblacion.id, poblacion.numdoc, poblacion.name, poblacion.area, poblacion.evaluador, poblacion.user_id, formularios.formulario";
-            axios.post(this.mimetic, {'tabla': 'poblacion', 'join': 'users:poblacion.user_id:users.id:left|formularios:poblacion.formulario_id:formularios.id:left|formularios_response:poblacion.numdoc:formularios_response.numdoc:left', 'agrupar': 'poblacion.numdoc:formularios_response.id', 'campos': campos}).then(res => {
+            let campos = "users.name AS responsable, poblacion.id, poblacion.numdoc, poblacion.name, poblacion.area, poblacion.evaluador, poblacion.user_id, form_active_view.formulario";
+            let join = [
+                "users:poblacion.user_id:users.id:left",
+                "form_active_view:poblacion.formulario_id:form_active_view.id:left",
+                "response_active_view:poblacion.numdoc:response_active_view.numdoc:left"
+            ].join('|');
+            // "formularios_response:poblacion.numdoc:formularios_response.numdoc:left"
+            let pam = {
+                'tabla': 'poblacion',
+                'join': join,
+                'agrupar': 'poblacion.numdoc:response_active_view.id',
+                'campos': campos,
+            };
+            axios.post(this.mimetic, pam).then(res => {
                 this.registros = res.data;
                 let tmp = {};
                 res.data.forEach(elm => {

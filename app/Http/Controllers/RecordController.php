@@ -48,6 +48,23 @@ class RecordController extends Controller
             $this->inicio();
         }
     }
+
+    public function vuePeople(Request $request)
+    {
+        // let campos = "users.name AS responsable, 
+            // 'tabla': 'poblacion', 
+            // 'join': 'users:poblacion.user_id:users.id:left|
+            // formularios:poblacion.formulario_id:formularios.id:left|
+            // formularios_response:poblacion.numdoc:formularios_response.numdoc:left',
+            // 'agrupar': 'poblacion.numdoc:formularios_response.id'
+        $rs = DB::table('temas')->join('formularios', function($join){
+                $join->on('temas.id', '=', 'formularios.tema_id')->where('temas.estado', '=', 'on');
+            })->join('formularios_response', 'formularios.id', '=', 'formularios_response.formulario_id')
+            ->rightJoin('poblacion', 'formularios_response.numdoc', '=', 'poblacion.numdoc')
+            ->select('poblacion.id', 'poblacion.numdoc', 'poblacion.name', 'poblacion.area', 'poblacion.evaluador', 'poblacion.user_id', 'formularios.formulario')
+            ->get();
+        return $rs;            
+    }
     
     public function showForms()
     {
@@ -298,6 +315,36 @@ class RecordController extends Controller
         $rs = $dat->save();
         $status = $rs? 'success': 'failed';
         return ['status' => $status];
+    }
+
+    public function vuePoblacionByUser(Request $request)
+    {
+        $datos = DB::table('users')
+            ->leftJoin('poblacion', 'users.id', '=', 'poblacion.user_id')
+            ->select('users.id', 'users.name', 'users.email', 'users.rol', DB::raw("IF(poblacion.id IS NULL, 0, 1) AS numpob"), 'poblacion.numdoc', 'poblacion.name AS persona')
+            ->get();
+        return $datos;
+    }
+
+    public function vuePoblacionByNumdoc(Request $request)
+    {
+        $raw = $request->numdocs;
+        $docs = explode(",", $raw);
+        $datos = DB::table('poblacion')->select('id', 'numdoc', 'name')->whereIn('numdoc', $docs)->get();
+        return $datos;
+    }
+
+    public function vueReasignPoblacion(Request $request)
+    {
+        $raw = $request->numdocs;
+        $docs = explode(',', $raw);
+        $destino = ($request->destino == 'none')? null: $request->destino;
+        if(!empty($docs)){
+            $rs = Poblacion::whereIn('numdoc', $docs)->update(['user_id' => $destino]);
+            return ['status' => 'success', 'affected' => $rs];
+        }else{
+            return ['status' => 'failed', 'affected' => 0];
+        }
     }
 
 }

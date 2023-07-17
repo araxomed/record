@@ -13,6 +13,7 @@ import ReadRecord from "./componentes/lector_registros.vue";
 import Statics from "./componentes/estadisticas.vue";
 import Exdata from "./componentes/excel_data.vue";
 import Chakro from "./componentes/chart_component.vue";
+import Asigna from "./componentes/asignacion.vue"
 
 createApp({
     components: {
@@ -26,7 +27,8 @@ createApp({
         'lector-registro': ReadRecord,
         'cmp-estadisticas': Statics,
         'excel-data': Exdata,
-        'chart-component': Chakro
+        'chart-component': Chakro,
+        'extra-asignacion': Asigna
     }
 }).mount("#appRecord");
 
