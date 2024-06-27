@@ -18,8 +18,8 @@ Route::get('/login', [Controller::class, 'login'])->name('login');
 Route::post('/login/auth', [Controller::class, 'authLogin'])->name('login.auth');
 Route::get('/logout', [Controller::class, 'logout'])->name('logout');
 
-Route::middleware(['authorize_api'])->group(function(){
-    Route::get('/', [Controller::class, 'dashboard'])->name('inicio');
-    Route::get('/dashboard', [Controller::class, 'dashboard'])->name('dashboard');
-    Route::get('/jobs', [Controller::class, 'jobs'])->name('jobs');
-});
+Route::get('/', [Controller::class, 'dashboard'])->name('inicio');
+Route::get('/dashboard', [Controller::class, 'dashboard'])->name('dashboard');
+Route::get('/jobs', [Controller::class, 'jobs'])->name('jobs');
+// Route::middleware(['authorize_api'])->group(function(){
+// });
